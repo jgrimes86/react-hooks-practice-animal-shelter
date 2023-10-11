@@ -6,6 +6,7 @@ import PetBrowser from "./PetBrowser";
 function App() {
   const [pets, setPets] = useState([]);
   const [filters, setFilters] = useState({ type: "all" });
+  const [petSelection, setPetSelection] = useState([])
 
   const petAPI = "http://localhost:3001/pets"
 
@@ -23,6 +24,20 @@ function App() {
     }))
   }
 
+  function filterChange(newFilter) {
+    setFilters({type : newFilter})
+  }
+
+  function showFilteredPets() {
+    setPetSelection(pets.filter((pet) => {
+      if (pet.type === filters.type) {
+        return pet
+      }
+    }))
+  }
+
+  const displayedPets = (petSelection.length > 0) ? petSelection : pets;
+
   return (
     <div className="ui container">
       <header>
@@ -31,10 +46,10 @@ function App() {
       <div className="ui container">
         <div className="ui grid">
           <div className="four wide column">
-            <Filters />
+            <Filters filterChange={filterChange} showFilteredPets={showFilteredPets} />
           </div>
           <div className="twelve wide column">
-            <PetBrowser pets={pets} adoptAPet={adoptAPet} />
+            <PetBrowser pets={displayedPets} adoptAPet={adoptAPet} />
           </div>
         </div>
       </div>
