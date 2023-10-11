@@ -1,24 +1,46 @@
-import React from "react";
+import React, {useState} from "react";
 
-function Pet() {
+function Pet({pet, adoptAPet}) {
+  const {id, age, gender, isAdopted, name, type, weight} = pet
+  const [adoption, setAdoption] = useState(isAdopted)
+
+  const genderIcon = (gender === "male") ? '♂' : '♀';
+  const alreadyAdoptedClass = isAdopted ? "ui primary button" : "ui disabled button";
+  const adoptPetClass = isAdopted ? "ui disabled button" : "ui primary button";
+
+  function handleClick() {
+    if(adoption === false) {
+      setAdoption(true)
+      fetch(`http://localhost:3001/pets/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({"isAdopted": true})
+      })
+      .then(response => response.json())
+      .then(newData => adoptAPet(newData))
+    }
+  }
+
   return (
     <div className="card" data-testid="pet">
       <div className="content">
         <span className="header">
-          {/*'♀' OR '♂' */}
-          PET NAME
+          {genderIcon}
+          {name}
         </span>
         <div className="meta">
-          <span className="date">PET TYPE</span>
+          <span className="date">{type}</span>
         </div>
         <div className="description">
-          <p>Age: PET AGE</p>
-          <p>Weight: PET WEIGHT</p>
+          <p>Age: {age}</p>
+          <p>Weight: {weight}</p>
         </div>
       </div>
       <div className="extra content">
-        <button className="ui disabled button">Already adopted</button>
-        <button className="ui primary button">Adopt pet</button>
+        <button className={alreadyAdoptedClass}>Already adopted</button>
+        <button className={adoptPetClass} onClick={handleClick}>Adopt pet</button>
       </div>
     </div>
   );
